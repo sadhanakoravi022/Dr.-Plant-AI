@@ -25,7 +25,8 @@ import {
   Share2,
   Square,
   CheckSquare,
-  RotateCcw
+  RotateCcw,
+  Sprout
 } from 'lucide-react';
 import { TreatmentVaultItem, LanguageCode } from '../types';
 import { SUPPORTED_LANGUAGES, FARM_CANOPY_IMG } from '../data/treatmentVaultData';
@@ -33,6 +34,7 @@ import { watermelonDB } from '../lib/watermelon-db';
 import { getTranslation } from '../data/translations';
 import { getDetailedOrganicGuide } from '../data/organicMasterclassData';
 import { PaymentPromptModal } from './PaymentPromptModal';
+import { GrowMyCropView } from './GrowMyCropView';
 import { ChemicalShopComponent } from './ChemicalShopComponent';
 import { OrganicReminderSetupModal } from './OrganicReminderSetupModal';
 import { OrganicReminderBanner } from './OrganicReminderBanner';
@@ -53,7 +55,11 @@ interface TreatmentVaultViewProps {
   onLanguageChange: (lang: LanguageCode) => void;
   onSelectForInspection?: (item: TreatmentVaultItem) => void;
   darkMode?: boolean;
+  growTarget?: { cropId: string; day: number } | null;
+  onGrowTargetConsumed?: () => void;
 }
+
+type VaultSection = 'treatments' | 'grow';
 
 type TierFilter = 'all' | 'standard' | 'organic_premium';
 
@@ -61,7 +67,10 @@ export const TreatmentVaultView: React.FC<TreatmentVaultViewProps> = ({
   currentLanguage,
   onLanguageChange,
   darkMode = false,
+  growTarget = null,
+  onGrowTargetConsumed,
 }) => {
+  const [section, setSection] = useState<VaultSection>(growTarget ? 'grow' : 'treatments');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCrop, setSelectedCrop] = useState<string>('All');
   const [selectedTier, setSelectedTier] = useState<TierFilter>('all');
@@ -86,6 +95,12 @@ export const TreatmentVaultView: React.FC<TreatmentVaultViewProps> = ({
   const [reminders, setReminders] = useState<OrganicCareReminder[]>(() => getReminders());
   const [dueReminders, setDueReminders] = useState<OrganicCareReminder[]>(() => getDueReminders());
   const [reminderModalItemId, setReminderModalItemId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!growTarget) return;
+    setSection('grow');
+    if (onGrowTargetConsumed) onGrowTargetConsumed();
+  }, [growTarget]);
 
   const refreshReminders = () => {
     setReminders(getReminders());
@@ -179,6 +194,59 @@ export const TreatmentVaultView: React.FC<TreatmentVaultViewProps> = ({
     }
   };
 
+  if (section === 'grow') {
+    return (
+      <div
+        className={`flex-1 overflow-y-auto p-4 space-y-3.5 select-none transition-colors ${
+          darkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'
+        }`}
+      >
+      <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+        <button
+          type="button"
+          onClick={() => setSection('treatments')}
+          className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+            section === 'treatments'
+              ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
+              : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <FlaskConical className="w-3.5 h-3.5" />
+          <span>Treatments</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setSection('grow')}
+          className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+            section === 'grow'
+              ? 'bg-[#14532D] text-white shadow-xs'
+              : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Sprout className="w-3.5 h-3.5" />
+          <span>Grow My Crop</span>
+        </button>
+      </div>
+
+        <GrowMyCropView
+          isPremiumUnlocked={isPremiumUnlocked}
+          onRequestUnlock={() => openUnlockModal('Grow My Crop')}
+          initialCropId={growTarget ? growTarget.cropId : null}
+          initialDay={growTarget && growTarget.day > 0 ? growTarget.day : null}
+          darkMode={darkMode}
+        />
+
+        <PaymentPromptModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          onUnlockSuccess={handleUnlockSuccess}
+          cropName={activePayCrop}
+          darkMode={darkMode}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       className={`flex-1 overflow-y-auto p-4 space-y-3.5 select-none transition-colors ${
@@ -242,6 +310,33 @@ export const TreatmentVaultView: React.FC<TreatmentVaultViewProps> = ({
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+        <button
+          type="button"
+          onClick={() => setSection('treatments')}
+          className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+            section === 'treatments'
+              ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
+              : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <FlaskConical className="w-3.5 h-3.5" />
+          <span>Treatments</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setSection('grow')}
+          className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+            section === 'grow'
+              ? 'bg-[#14532D] text-white shadow-xs'
+              : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Sprout className="w-3.5 h-3.5" />
+          <span>Grow My Crop</span>
+        </button>
       </div>
 
       {/* Premium Tier Status & Unlock Callout Banner */}

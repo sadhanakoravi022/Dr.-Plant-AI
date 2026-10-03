@@ -18,6 +18,7 @@ import { OfflineStatusBanner } from './components/OfflineStatusBanner';
 import { InferenceResult, LanguageCode, DiagnosisRecord } from './types';
 import { watermelonDB } from './lib/watermelon-db';
 import { getTranslation } from './data/translations';
+import { registerNotificationTapHandler } from './lib/cropPlanNotifications';
 
 export default function App() {
   // Default to 'home' landing page so camera does NOT automatically turn on
@@ -35,7 +36,29 @@ export default function App() {
   const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
   const [authGateStatus, setAuthGateStatus] = useState<'checking' | 'show' | 'done'>('checking');
 
+  const [growTarget, setGrowTarget] = useState<{ cropId: string; day: number } | null>(null);
+
   const t = getTranslation(currentLanguage);
+
+  useEffect(() => {
+    const openFromHash = () => {
+      const match = window.location.hash.match(/^#grow\/([a-z-]+)(?:\/(\d+))?$/);
+      if (!match) return;
+      setGrowTarget({ cropId: match[1], day: match[2] ? Number(match[2]) : 0 });
+      setActiveTab('vault');
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    };
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
+    const unregister = registerNotificationTapHandler((target) => {
+      setGrowTarget(target);
+      setActiveTab('vault');
+    });
+    return () => {
+      window.removeEventListener('hashchange', openFromHash);
+      unregister();
+    };
+  }, []);
 
   useEffect(() => {
     if (localStorage.getItem('dr_plant_auth_gate_done') === 'true') {
@@ -191,6 +214,8 @@ export default function App() {
               currentLanguage={currentLanguage}
               onLanguageChange={handleLanguageChange}
               darkMode={darkMode}
+              growTarget={growTarget}
+              onGrowTargetConsumed={() => setGrowTarget(null)}
             />
           )}
 
