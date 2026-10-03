@@ -263,8 +263,13 @@ for update using (
   )
 );
 
-create policy premium_subscriptions_public_read on public.premium_subscriptions
-for select using (true);
+drop policy if exists premium_subscriptions_public_read on public.premium_subscriptions;
+drop policy if exists premium_subscriptions_admin_read on public.premium_subscriptions;
+
+create policy premium_subscriptions_admin_read on public.premium_subscriptions
+for select using (
+  exists (select 1 from public.profiles pr where pr.id = auth.uid() and pr.role = 'admin')
+);
 
 create policy premium_subscriptions_anon_insert on public.premium_subscriptions
 for insert with check (status = 'pending_verification');

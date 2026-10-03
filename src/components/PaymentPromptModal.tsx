@@ -74,7 +74,6 @@ export const PaymentPromptModal: React.FC<PaymentPromptModalProps> = ({
 
     setIsSuccess(true);
     setTimeout(() => {
-      onUnlockSuccess();
       setIsSuccess(false);
       onClose();
     }, 1800);
@@ -133,7 +132,7 @@ export const PaymentPromptModal: React.FC<PaymentPromptModalProps> = ({
                 UTR: <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{utrReference.trim()}</span>
               </p>
               <p className="text-xs font-bold text-emerald-600 dark:text-emerald-300">
-                Unlocking all Masterclass Organic Guides on this device now...
+                Your payment is pending verification. Premium guides will unlock after an admin confirms the payment.
               </p>
             </div>
           ) : (
@@ -332,7 +331,7 @@ export const PaymentPromptModal: React.FC<PaymentPromptModalProps> = ({
                 </button>
                 <div className="flex items-center justify-center gap-1.5 text-[10px] opacity-60 mt-2 text-center">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span>Unlocks instantly on this device. We spot-check UTRs and may contact you to verify.</span>
+                  <span>Your UTR is reviewed before premium access is granted. Do not submit a reference for an unpaid transaction.</span>
                 </div>
               </div>
             </>
