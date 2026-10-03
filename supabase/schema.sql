@@ -9,6 +9,18 @@ create table public.profiles (
   created_at timestamptz not null default now()
 );
 
+create table public.application_users (
+  id uuid primary key references auth.users(id) on delete cascade,
+  full_name text not null,
+  phone text not null unique,
+  village text,
+  district text,
+  state text,
+  pincode text,
+  preferred_language text not null default 'en',
+  created_at timestamptz not null default now()
+);
+
 create table public.shops (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references public.profiles(id) on delete cascade,
@@ -148,6 +160,7 @@ before update on public.orders
 for each row execute function public.set_updated_at();
 
 alter table public.profiles enable row level security;
+alter table public.application_users enable row level security;
 alter table public.shops enable row level security;
 alter table public.shop_products enable row level security;
 alter table public.product_bulk_uploads enable row level security;
@@ -162,6 +175,15 @@ create policy profiles_insert_own on public.profiles
 for insert with check (auth.uid() = id);
 
 create policy profiles_update_own on public.profiles
+for update using (auth.uid() = id);
+
+create policy application_users_select_own on public.application_users
+for select using (auth.uid() = id);
+
+create policy application_users_insert_own on public.application_users
+for insert with check (auth.uid() = id);
+
+create policy application_users_update_own on public.application_users
 for update using (auth.uid() = id);
 
 create policy shops_public_read_active on public.shops
