@@ -66,6 +66,9 @@ function getAuthErrorMessage(message: string, action: 'sign in' | 'sign up'): st
   if (normalizedMessage.includes('error sending confirmation email')) {
     return 'Sign-up email delivery failed. Disable "Confirm email" in Supabase Auth settings to enable phone-based login.';
   }
+  if (normalizedMessage.includes('invalid api key')) {
+    return 'Supabase API key is invalid or belongs to a different project. Update VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY with matching values, then restart the app.';
+  }
   if (normalizedMessage.includes('row-level security') || normalizedMessage.includes('violates row-level security')) {
     return 'Database permissions issue on profile creation. Please apply the latest schema trigger or disable email confirmation in Supabase.';
   }
