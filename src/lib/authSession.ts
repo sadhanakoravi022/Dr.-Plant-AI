@@ -48,6 +48,25 @@ function assertConfigured(): string | null {
   return null;
 }
 
+function getAuthErrorMessage(message: string, action: 'sign in' | 'sign up'): string {
+  const normalizedMessage = message.toLowerCase();
+
+  if (normalizedMessage.includes('rate limit') || normalizedMessage.includes('too many requests')) {
+    return 'Too many account attempts. Please wait a few minutes and try again.';
+  }
+  if (normalizedMessage.includes('email not confirmed')) {
+    return 'Please confirm your account email before signing in.';
+  }
+  if (normalizedMessage.includes('invalid login credentials')) {
+    return 'Incorrect mobile number or password.';
+  }
+  if (normalizedMessage.includes('already registered')) {
+    return 'This mobile number is already registered. Try logging in instead.';
+  }
+
+  return `Unable to ${action} right now. Please try again.`;
+}
+
 export async function signUpFarmer(input: SignUpInput): Promise<AuthResult> {
   const configError = assertConfigured();
   if (configError || !supabase) return { success: false, errorMessage: configError! };
@@ -71,10 +90,7 @@ export async function signUpFarmer(input: SignUpInput): Promise<AuthResult> {
   });
 
   if (error) {
-    if (error.message.toLowerCase().includes('already registered')) {
-      return { success: false, errorMessage: 'This mobile number is already registered. Try logging in instead.' };
-    }
-    return { success: false, errorMessage: error.message };
+    return { success: false, errorMessage: getAuthErrorMessage(error.message, 'sign up') };
   }
 
   const userId = data.user?.id;
@@ -121,7 +137,7 @@ export async function signInFarmer(input: SignInInput): Promise<AuthResult> {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password: input.password });
 
   if (error) {
-    return { success: false, errorMessage: 'Incorrect mobile number or password.' };
+    return { success: false, errorMessage: getAuthErrorMessage(error.message, 'sign in') };
   }
 
   const userId = data.user?.id;

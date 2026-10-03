@@ -36,7 +36,7 @@ interface AuthViewProps {
 const BRAND_GREEN = '#14532D';
 
 export const AuthView: React.FC<AuthViewProps> = ({ currentLanguage, darkMode = false, onAuthenticated, onSkip }) => {
-  const [mode, setMode] = useState<'login' | 'signup'>('signup');
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [profile, setProfile] = useState<FarmerProfile | null>(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,14 +67,17 @@ export const AuthView: React.FC<AuthViewProps> = ({ currentLanguage, darkMode = 
     setIsSubmitting(true);
 
     const result =
-      mode === 'signup'
-        ? await signUpFarmer({ fullName, phone, password, village, district, state, pincode, preferredLanguage })
-        : await signInFarmer({ phone, password });
+      mode === 'login'
+        ? await signInFarmer({ phone, password })
+        : await signUpFarmer({ fullName, phone, password, village, district, state, pincode, preferredLanguage });
 
     setIsSubmitting(false);
 
     if (!result.success) {
       setErrorMessage(result.errorMessage || 'Something went wrong. Please try again.');
+      if (result.errorMessage?.includes('Too many account attempts')) {
+        setMode('login');
+      }
       return;
     }
 
