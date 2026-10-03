@@ -1,5 +1,6 @@
 -- ==============================================================================
--- Dr. Plant AI - Unified Supabase Database Schema
+-- Dr. Plant AI - Complete Supabase Database Schema
+-- Optimized for Supabase Auth, PostGIS, Storage Buckets, Realtime, & RLS
 -- Supports: Mobile/PWA Farmer App, Partner Shop Web Portal, & Admin Dashboard
 -- ==============================================================================
 
@@ -8,7 +9,7 @@ create extension if not exists postgis with schema extensions;
 create extension if not exists pgcrypto with schema extensions;
 
 -- ==============================================================================
--- 2. CORE USERS & PROFILES
+-- 2. CORE USERS & PROFILES (Supabase Auth Integrated)
 -- ==============================================================================
 
 -- Web Portal Users: Shop Owners, Platform Admins, Agronomists
@@ -125,7 +126,7 @@ create table if not exists public.product_bulk_uploads (
 create index if not exists product_bulk_uploads_shop_id_idx on public.product_bulk_uploads (shop_id);
 
 -- ==============================================================================
--- 5. ORDERS & COMMERCE
+-- 5. ORDERS & COMMERCE (Realtime enabled for Web & Mobile)
 -- ==============================================================================
 
 create table if not exists public.orders (
@@ -154,7 +155,7 @@ create index if not exists orders_status_idx on public.orders (status);
 create index if not exists orders_created_at_idx on public.orders (created_at desc);
 
 -- ==============================================================================
--- 6. PREMIUM SUBSCRIPTIONS (UPI Payments & Verification)
+-- 6. PREMIUM SUBSCRIPTIONS (UPI Payments & Admin Verification)
 -- ==============================================================================
 
 create table if not exists public.premium_subscriptions (
@@ -869,3 +870,54 @@ end;
 $$;
 
 grant execute on function public.verify_premium_subscription to authenticated;
+
+-- ==============================================================================
+-- 13. SUPABASE REALTIME & STORAGE BUCKETS
+-- ==============================================================================
+
+-- 1. Enable Supabase Realtime Replication for Live UI updates
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    begin
+      alter publication supabase_realtime add table public.orders;
+    exception when others then null;
+    end;
+    begin
+      alter publication supabase_realtime add table public.advisories;
+    exception when others then null;
+    end;
+    begin
+      alter publication supabase_realtime add table public.premium_subscriptions;
+    exception when others then null;
+    end;
+  end if;
+end $$;
+
+-- 2. Supabase Storage Buckets
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values
+  ('crop-scans', 'crop-scans', true, 10485760, array['image/jpeg', 'image/png', 'image/webp']),
+  ('product-images', 'product-images', true, 10485760, array['image/jpeg', 'image/png', 'image/webp']),
+  ('shop-media', 'shop-media', true, 10485760, array['image/jpeg', 'image/png', 'image/webp']),
+  ('bulk-uploads', 'bulk-uploads', false, 20971520, array['text/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+-- 3. Storage Security Policies
+drop policy if exists "Public Access for Media" on storage.objects;
+create policy "Public Access for Media" on storage.objects
+for select using (bucket_id in ('crop-scans', 'product-images', 'shop-media'));
+
+drop policy if exists "Upload Crop Scans" on storage.objects;
+create policy "Upload Crop Scans" on storage.objects
+for insert with check (bucket_id = 'crop-scans');
+
+drop policy if exists "Shop Owner Upload Assets" on storage.objects;
+create policy "Shop Owner Upload Assets" on storage.objects
+for insert with check (
+  bucket_id in ('product-images', 'shop-media', 'bulk-uploads')
+  and (auth.role() = 'authenticated' or exists (select 1 from public.profiles p where p.id = auth.uid()))
+);
