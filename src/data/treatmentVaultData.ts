@@ -2,7 +2,7 @@ import { LanguageCode, LanguageOption, TreatmentVaultItem } from '../types';
 
 const tomatoBlightImg = 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1200&q=80';
 const cornRustImg = 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80';
-const healthyLeafImg = 'https://images.unsplash.com/photo-1464226184884-fa52ac9fcf7a?auto=format&fit=crop&w=1200&q=80';
+const healthyLeafImg = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80';
 const farmCanopyImg = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80';
 const landingHeroImg = 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80';
 const potatoBlightImg = 'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?auto=format&fit=crop&w=1200&q=80';
@@ -478,7 +478,7 @@ export const TREATMENT_VAULT: TreatmentVaultItem[] = [
   },
   {
     id: 'tomato_yellow_leaf_curl',
-    imageUrl: 'https://images.unsplash.com/photo-1592417817098-8f3d69106093?auto=format&fit=crop&w=600&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=600&q=80',
     crop: 'Tomato',
     disease: 'Yellow Leaf Curl Virus',
     pathogenType: 'virus',
