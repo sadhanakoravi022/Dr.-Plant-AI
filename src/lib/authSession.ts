@@ -63,6 +63,9 @@ function getAuthErrorMessage(message: string, action: 'sign in' | 'sign up'): st
   if (normalizedMessage.includes('already registered')) {
     return 'This mobile number is already registered. Try logging in instead.';
   }
+  if (normalizedMessage.includes('error sending confirmation email')) {
+    return 'Sign-up email delivery is not configured in Supabase. Disable email confirmation for this phone-based login, or configure an SMTP provider.';
+  }
 
   return `Unable to ${action} right now. Please try again.`;
 }
@@ -98,9 +101,8 @@ export async function signUpFarmer(input: SignUpInput): Promise<AuthResult> {
     return { success: false, errorMessage: 'Sign up did not return a user. Please try again.' };
   }
 
-  const { error: profileError } = await supabase.from('profiles').insert({
+  const { error: profileError } = await supabase.from('application_users').insert({
     id: userId,
-    role: 'farmer',
     full_name: input.fullName.trim(),
     phone: digitsOnly,
     village: input.village.trim(),
@@ -111,7 +113,13 @@ export async function signUpFarmer(input: SignUpInput): Promise<AuthResult> {
   });
 
   if (profileError) {
-    return { success: false, errorMessage: profileError.message };
+    return {
+      success: false,
+      errorMessage:
+        profileError.code === '42P01'
+          ? 'Your account was created, but the profile database schema does not allow farmer accounts. Apply the latest Supabase schema.'
+          : profileError.message,
+    };
   }
 
   return {
@@ -153,7 +161,7 @@ export async function fetchFarmerProfile(userId: string): Promise<FarmerProfile 
   if (!isSupabaseConfigured || !supabase) return null;
 
   const { data, error } = await supabase
-    .from('profiles')
+    .from('application_users')
     .select('id, full_name, phone, village, district, state, pincode, preferred_language')
     .eq('id', userId)
     .maybeSingle();
