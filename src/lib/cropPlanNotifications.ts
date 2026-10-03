@@ -38,7 +38,7 @@ function notificationIdFor(planId: string, day: number): number {
 }
 
 function buildTitle(crop: CropPlan, day: number): string {
-  return `🌱 Dr.Plant AI — ${crop.name.split(' ')[0]} Day ${day}`;
+  return `🌱 Dr.Plant AI — ${crop.shortName} Day ${day}`;
 }
 
 function buildBody(crop: CropPlan, day: number): string {

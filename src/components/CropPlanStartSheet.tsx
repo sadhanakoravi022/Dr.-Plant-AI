@@ -36,7 +36,7 @@ export const CropPlanStartSheet: React.FC<CropPlanStartSheetProps> = ({
       >
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-black">
-            {crop.icon} Start {crop.durationDays}-Day {crop.name.split(' ')[0]} Plan
+            {crop.icon} Start {crop.durationDays}-Day {crop.shortName} Plan
           </h3>
           <button type="button" onClick={onClose} className="cursor-pointer opacity-60 hover:opacity-100">
             <X className="w-4 h-4" />

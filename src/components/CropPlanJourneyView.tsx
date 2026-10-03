@@ -157,7 +157,7 @@ export const CropPlanJourneyView: React.FC<CropPlanJourneyViewProps> = ({
         <div className="flex items-center gap-3">
           <div className="text-4xl leading-none">{crop.icon}</div>
           <div>
-            <h2 className="text-base font-black tracking-tight">{crop.name.split(' ')[0]}</h2>
+            <h2 className="text-base font-black tracking-tight">{crop.shortName}</h2>
             <p className="text-[11px] opacity-70 font-semibold">{crop.durationDays}-Day Growing Journey</p>
           </div>
         </div>

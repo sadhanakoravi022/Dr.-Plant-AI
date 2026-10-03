@@ -54,7 +54,7 @@ export const GrowMyCropView: React.FC<GrowMyCropViewProps> = ({
         </div>
         <h3 className="text-base font-black tracking-tight">Grow My Crop is Premium</h3>
         <p className="text-xs opacity-75 leading-relaxed">
-          Get a guided 30-day journey with one clear task each day and daily reminders, starting with Palak.
+          Get a guided 30-day journey with one clear task each day and daily reminders for your vegetables.
           Any progress you already made is saved and will be waiting when you unlock Premium.
         </p>
         <button

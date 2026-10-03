@@ -22,6 +22,7 @@ export interface CropPlanTask {
 export interface CropPlan {
   crop: CropPlanId;
   name: string;
+  shortName: string;
   icon: string;
   durationDays: number;
   tasks: CropPlanTask[];
