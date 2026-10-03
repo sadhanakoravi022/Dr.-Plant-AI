@@ -384,7 +384,7 @@ export async function runLocalTFLiteInference(
       return {
         id: `diag_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
         timestamp: Date.now(),
-        label: `${predicted.crop} ${predicted.disease}`,
+        label: predicted.disease,
         crop: predicted.crop,
         disease: predicted.disease,
         pathogenType: predicted.pathogenType,
@@ -512,7 +512,7 @@ export async function runLocalTFLiteInference(
   return {
     id: `diag_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
     timestamp: Date.now(),
-    label: `${vaultItem.crop} ${vaultItem.disease}`,
+    label: vaultItem.disease,
     crop: vaultItem.crop,
     disease: vaultItem.disease,
     pathogenType: vaultItem.pathogenType,
