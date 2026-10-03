@@ -185,7 +185,7 @@ export const DiagnosisResultModal: React.FC<DiagnosisResultModalProps> = ({
             }`}
           >
             <h4 className="font-extrabold text-base leading-tight">
-              {translation.title || result.disease}
+              {result.label}
             </h4>
             <p className="text-xs opacity-70 italic mt-0.5">
               {vaultItem.pathogenScientificName}
