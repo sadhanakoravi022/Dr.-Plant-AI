@@ -787,6 +787,104 @@ export const TREATMENT_VAULT: TreatmentVaultItem[] = [
         emergencyAlert: 'उत्कृष्ट नियोजन! शेताची नियमित पाहणी चालू ठेवा.'
       }
     }
+  },
+  {
+    id: 'general_disease_care',
+    imageUrl: farmCanopyImg,
+    crop: 'Any Crop',
+    disease: 'General Disease Care',
+    pathogenType: 'fungus',
+    pathogenScientificName: 'Cause to be confirmed',
+    commonNames: ['First-aid steps for leaf disease'],
+    symptomsDescription: 'The scan found signs of disease that do not have a dedicated guide in this app yet. Look for spots, patches, yellowing, curling, powdery or fuzzy growth, or wilting.',
+    favorableConditions: 'Most leaf diseases spread when leaves stay wet for long, plants are crowded with poor air flow, and infected leaves or debris are left in the field.',
+    severityLevel: 'moderate',
+    organicRemedies: [
+      {
+        name: 'Remove and destroy infected leaves',
+        recipe: 'Pick off badly affected leaves with clean scissors. Put them in a bag and burn or bury them away from the field. Do not add them to compost.',
+        prepTime: '10 mins',
+        costEstimate: 'Free / Kitchen Waste',
+        applicationMethod: 'Do this first, in dry weather. Wash your hands and clean tools afterwards so the disease is not carried to healthy plants.'
+      },
+      {
+        name: 'Neem Oil Spray',
+        recipe: 'Mix 5 ml neem oil and a few drops of mild liquid soap into 1 litre of water and shake well.',
+        prepTime: '5 mins',
+        costEstimate: 'Low (< $2.00)',
+        applicationMethod: 'Spray both sides of the leaves in the evening and repeat every 7 days. Test on a few leaves first and wait a day to check they are not harmed.'
+      }
+    ],
+    chemicalTreatments: [],
+    culturalPractices: [
+      'Water at the base of the plant, in the morning, and avoid wetting the leaves',
+      'Space or prune plants so air can move between them',
+      'Keep this plant away from healthy ones and remove fallen leaves and weeds around it',
+      'Clean tools before moving from a sick plant to a healthy one'
+    ],
+    preventionTips: [
+      'Get the disease confirmed by your local agriculture officer or Krishi Vigyan Kendra (KVK) before spraying any chemical.',
+      'Use certified disease-free seed or seedlings and rotate crops every season.',
+      'Check the underside of leaves every week so problems are caught early.'
+    ],
+    translations: {
+      en: {
+        title: 'General Plant Disease Care',
+        summary: 'Signs of disease were found, but this app has no dedicated guide for it yet. These first steps are safe for most crops.',
+        symptoms: 'Spots, patches, yellowing, curling, powdery or fuzzy growth, or wilting on leaves.',
+        organicAdvice: 'Remove and destroy badly affected leaves. Spray neem oil (5 ml per litre of water, with a few drops of soap) on both sides of the leaves in the evening, and repeat every 7 days.',
+        chemicalAdvice: 'Do not spray any chemical until the disease is confirmed. Show the leaf to your local agriculture officer or Krishi Vigyan Kendra (KVK) first.',
+        emergencyAlert: 'Keep this plant away from healthy ones, avoid wetting the leaves, and get the disease confirmed before it spreads.'
+      },
+      hi: {
+        title: 'पौधों के रोग की सामान्य देखभाल',
+        summary: 'रोग के लक्षण मिले हैं, लेकिन इस रोग के लिए ऐप में अलग गाइड अभी नहीं है। ये शुरुआती कदम ज़्यादातर फसलों के लिए सुरक्षित हैं।',
+        symptoms: 'पत्तियों पर धब्बे, पीलापन, मुड़ना, सफ़ेद पाउडर जैसी परत या मुरझाना।',
+        organicAdvice: 'ज़्यादा प्रभावित पत्तियों को तोड़कर नष्ट कर दें। शाम को पत्तियों के दोनों ओर नीम का तेल (5 मि.ली. प्रति लीटर पानी, साथ में थोड़ा साबुन) छिड़कें और हर 7 दिन में दोहराएँ।',
+        chemicalAdvice: 'रोग की पुष्टि होने तक कोई भी रासायनिक दवा न छिड़कें। पहले पत्ती अपने स्थानीय कृषि अधिकारी या कृषि विज्ञान केंद्र (KVK) को दिखाएँ।',
+        emergencyAlert: 'इस पौधे को स्वस्थ पौधों से दूर रखें, पत्तियों को गीला न करें और रोग फैलने से पहले उसकी पुष्टि करवाएँ।'
+      },
+      sw: {
+        title: 'Utunzaji wa Jumla wa Magonjwa ya Mimea',
+        summary: 'Dalili za ugonjwa zimeonekana, lakini programu bado haina mwongozo maalum wa ugonjwa huu. Hatua hizi za kwanza ni salama kwa mazao mengi.',
+        symptoms: 'Madoa, mabaka, majani kuwa ya manjano, kujikunja, unga au ukungu juu ya majani, au kunyauka.',
+        organicAdvice: 'Ondoa na uharibu majani yaliyoathirika sana. Jioni, nyunyizia mafuta ya mwarobaini (ml 5 kwa lita moja ya maji, na matone machache ya sabuni) pande zote mbili za majani na urudie kila siku 7.',
+        chemicalAdvice: 'Usinyunyize dawa yoyote ya kemikali hadi ugonjwa uthibitishwe. Onyesha jani kwa afisa kilimo wa eneo lako kwanza.',
+        emergencyAlert: 'Weka mmea huu mbali na mimea yenye afya, epuka kulowesha majani, na uthibitishe ugonjwa kabla haujaenea.'
+      },
+      es: {
+        title: 'Cuidado general de enfermedades de las plantas',
+        summary: 'Se detectaron señales de enfermedad, pero la app aún no tiene una guía específica. Estos primeros pasos son seguros para la mayoría de los cultivos.',
+        symptoms: 'Manchas, parches, amarillamiento, enrollamiento, polvo o moho en las hojas, o marchitez.',
+        organicAdvice: 'Retire y destruya las hojas muy afectadas. Por la tarde, rocíe aceite de neem (5 ml por litro de agua, con unas gotas de jabón) por ambos lados de las hojas y repita cada 7 días.',
+        chemicalAdvice: 'No aplique ningún producto químico hasta confirmar la enfermedad. Primero muestre la hoja a su técnico agrícola local.',
+        emergencyAlert: 'Mantenga esta planta alejada de las sanas, evite mojar las hojas y confirme la enfermedad antes de que se propague.'
+      },
+      te: {
+        title: 'మొక్కల వ్యాధుల సాధారణ సంరక్షణ',
+        summary: 'వ్యాధి లక్షణాలు కనిపించాయి, కానీ ఈ యాప్‌లో దీనికి ప్రత్యేక గైడ్ ఇంకా లేదు. ఈ మొదటి చర్యలు చాలా పంటలకు సురక్షితం.',
+        symptoms: 'ఆకులపై మచ్చలు, పసుపు రంగు, ముడుచుకోవడం, పొడి లేదా బూజు పొర, లేదా వాడిపోవడం.',
+        organicAdvice: 'ఎక్కువగా దెబ్బతిన్న ఆకులను తీసి నాశనం చేయండి. సాయంత్రం ఆకులకు రెండు వైపులా వేప నూనె (లీటరు నీటికి 5 మి.లీ., కొద్దిగా సబ్బుతో) పిచికారీ చేసి, ప్రతి 7 రోజులకు మళ్లీ చేయండి.',
+        chemicalAdvice: 'వ్యాధి నిర్ధారణ అయ్యే వరకు ఎలాంటి రసాయన మందును పిచికారీ చేయకండి. ముందుగా ఆకును మీ స్థానిక వ్యవసాయ అధికారికి లేదా కృషి విజ్ఞాన కేంద్రానికి (KVK) చూపించండి.',
+        emergencyAlert: 'ఈ మొక్కను ఆరోగ్యకరమైన మొక్కలకు దూరంగా ఉంచండి, ఆకులు తడవకుండా చూడండి, వ్యాధి వ్యాపించకముందే నిర్ధారణ చేయించండి.'
+      },
+      bn: {
+        title: 'গাছের রোগের সাধারণ যত্ন',
+        summary: 'রোগের লক্ষণ পাওয়া গেছে, কিন্তু অ্যাপে এর জন্য এখনও আলাদা গাইড নেই। এই প্রাথমিক পদক্ষেপগুলো বেশিরভাগ ফসলের জন্য নিরাপদ।',
+        symptoms: 'পাতায় দাগ, হলুদ ভাব, কুঁকড়ে যাওয়া, সাদা গুঁড়ো বা ছত্রাকের আস্তরণ, অথবা নেতিয়ে পড়া।',
+        organicAdvice: 'বেশি আক্রান্ত পাতা তুলে নষ্ট করে ফেলুন। সন্ধ্যায় পাতার দুই পাশে নিম তেল (প্রতি লিটার পানিতে ৫ মি.লি., সঙ্গে সামান্য সাবান) স্প্রে করুন এবং প্রতি ৭ দিনে আবার করুন।',
+        chemicalAdvice: 'রোগ নিশ্চিত না হওয়া পর্যন্ত কোনো রাসায়নিক স্প্রে করবেন না। আগে পাতাটি আপনার স্থানীয় কৃষি কর্মকর্তাকে দেখান।',
+        emergencyAlert: 'এই গাছটি সুস্থ গাছ থেকে দূরে রাখুন, পাতা ভেজানো এড়িয়ে চলুন এবং রোগ ছড়ানোর আগে নিশ্চিত করুন।'
+      },
+      mr: {
+        title: 'वनस्पती रोगांची सामान्य काळजी',
+        summary: 'रोगाची लक्षणे आढळली आहेत, पण या रोगासाठी अॅपमध्ये अजून स्वतंत्र मार्गदर्शक नाही. ही सुरुवातीची पावले बहुतेक पिकांसाठी सुरक्षित आहेत.',
+        symptoms: 'पानांवर डाग, पिवळेपणा, पाने गुंडाळणे, पांढरी पावडर किंवा बुरशीचा थर, किंवा सुकणे.',
+        organicAdvice: 'जास्त बाधित पाने काढून नष्ट करा. संध्याकाळी पानांच्या दोन्ही बाजूंना कडुनिंब तेल (प्रति लिटर पाण्यात ५ मि.ली., थोड्या साबणासह) फवारा आणि दर ७ दिवसांनी पुन्हा करा.',
+        chemicalAdvice: 'रोगाची खात्री होईपर्यंत कोणतेही रासायनिक औषध फवारू नका. आधी पान तुमच्या स्थानिक कृषी अधिकाऱ्याला किंवा कृषी विज्ञान केंद्राला (KVK) दाखवा.',
+        emergencyAlert: 'हे रोप निरोगी रोपांपासून दूर ठेवा, पाने ओली होऊ देऊ नका आणि रोग पसरण्याआधी त्याची खात्री करून घ्या.'
+      }
+    }
   }
 ];
 
