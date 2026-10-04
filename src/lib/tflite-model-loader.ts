@@ -61,7 +61,9 @@ export async function fetchStaticShapeModel(urls: string[]): Promise<{ bytes: Ui
         errors.push(`${url}: not a .tflite file (got ${res.headers.get('content-type') || 'unknown type'})`);
         continue;
       }
-      relaxDynamicDims(bytes);
+      // The current training export fixes the batch dimension to 1. Do not
+      // rewrite the FlatBuffer here: a partial rewrite can corrupt a valid
+      // model before LiteRT receives it.
       return { bytes, url };
     } catch (e) {
       errors.push(`${url}: ${(e as Error).message}`);

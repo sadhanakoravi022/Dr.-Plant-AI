@@ -52,9 +52,10 @@ export const PLANTVILLAGE_CLASSES = [
 ];
 
 export function parsePlantVillageClassName(className: string): { crop: string; disease: string; pathogenType: PathogenType } {
-  const parts = className.split('___');
-  const crop = (parts[0] || className).replace(/_/g, ' ').trim();
-  const diseaseRaw = (parts[1] || 'Unknown').replace(/_/g, ' ').trim();
+  const cleanedName = className.trim();
+  const parts = cleanedName.split(/___|\s+[-–—]\s+/);
+  const crop = (parts[0] || cleanedName).replace(/_/g, ' ').trim();
+  const diseaseRaw = (parts[1] || parts[0] || 'Unknown').replace(/_/g, ' ').trim();
   const lower = diseaseRaw.toLowerCase();
 
   let pathogenType: PathogenType = 'fungus';
@@ -109,6 +110,7 @@ export const CLASS_TO_TREATMENT_MAP: Record<string, string> = {
 
 let cachedModel: CompiledModel | null = null;
 let modelLoadPromise: Promise<CompiledModel | null> | null = null;
+let modelLabels: string[] = PLANTVILLAGE_CLASSES;
 let modelAvailable = false;
 
 export async function getDeepLearningModel(): Promise<CompiledModel | null> {
@@ -120,6 +122,15 @@ export async function getDeepLearningModel(): Promise<CompiledModel | null> {
       // LiteRT wasm runtime: copied into public/litert-wasm/ by scripts/copy-litert-wasm.mjs
       const base = import.meta.env.BASE_URL || '/';
       await loadLiteRt(`${base}litert-wasm/`);
+
+      const labelsResponse = await fetch(`${base}model/trained_model/labels.txt`);
+      if (labelsResponse.ok) {
+        const labels = (await labelsResponse.text())
+          .split(/\r?\n/)
+          .map((label) => label.trim())
+          .filter(Boolean);
+        if (labels.length > 0) modelLabels = labels;
+      }
 
       // LiteRT.js needs a fixed input shape. fetchStaticShapeModel() downloads the
       // first valid .tflite from the list and changes the dynamic batch size (-1)
@@ -133,7 +144,6 @@ export async function getDeepLearningModel(): Promise<CompiledModel | null> {
       modelAvailable = true;
       return model;
     } catch (err) {
-      console.error('LiteRT model failed to load, using fallback engine', err);
       modelAvailable = false;
       return null;
     }
@@ -337,7 +347,7 @@ export async function runLocalTFLiteInference(
 
       // 2. Rank classes by softmax probability
       const classScores = Array.from(rawProbabilities).map((prob, idx) => ({
-        className: PLANTVILLAGE_CLASSES[idx] || `Class_${idx}`,
+        className: modelLabels[idx] || `Class_${idx}`,
         prob: prob * 100,
       }));
 
@@ -359,19 +369,19 @@ export async function runLocalTFLiteInference(
 
       const topPredictions: TopPrediction[] = [
         {
-          label: `${predicted.crop} - ${predicted.disease}`,
+          label: predicted.disease,
           crop: predicted.crop,
           disease: predicted.disease,
           confidence,
         },
         {
-          label: `${pred2.crop} - ${pred2.disease}`,
+          label: pred2.disease,
           crop: pred2.crop,
           disease: pred2.disease,
           confidence: parseFloat(top2.prob.toFixed(1)),
         },
         {
-          label: `${pred3.crop} - ${pred3.disease}`,
+          label: pred3.disease,
           crop: pred3.crop,
           disease: pred3.disease,
           confidence: parseFloat(top3.prob.toFixed(1)),
@@ -485,19 +495,19 @@ export async function runLocalTFLiteInference(
 
   const topPredictions: TopPrediction[] = [
     {
-      label: `${vaultItem.crop} - ${vaultItem.disease}`,
+      label: vaultItem.disease,
       crop: vaultItem.crop,
       disease: vaultItem.disease,
       confidence,
     },
     {
-      label: `${otherVaults[0].crop} - ${otherVaults[0].disease}`,
+      label: otherVaults[0].disease,
       crop: otherVaults[0].crop,
       disease: otherVaults[0].disease,
       confidence: secondConf,
     },
     {
-      label: `${otherVaults[1].crop} - ${otherVaults[1].disease}`,
+      label: otherVaults[1].disease,
       crop: otherVaults[1].crop,
       disease: otherVaults[1].disease,
       confidence: thirdConf,
