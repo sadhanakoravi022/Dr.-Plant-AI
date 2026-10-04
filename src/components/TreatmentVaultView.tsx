@@ -551,6 +551,10 @@ export const TreatmentVaultView: React.FC<TreatmentVaultViewProps> = ({
                         src={item.imageUrl}
                         alt={item.disease}
                         className="w-full h-full object-cover"
+                        onError={(event) => {
+                          event.currentTarget.onerror = null;
+                          event.currentTarget.src = FARM_CANOPY_IMG;
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-emerald-500/10 text-emerald-500">
@@ -621,6 +625,10 @@ export const TreatmentVaultView: React.FC<TreatmentVaultViewProps> = ({
                         src={item.imageUrl}
                         alt={item.disease}
                         className="w-full h-36 object-cover"
+                        onError={(event) => {
+                          event.currentTarget.onerror = null;
+                          event.currentTarget.src = FARM_CANOPY_IMG;
+                        }}
                       />
                       <div className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] text-white font-bold flex items-center gap-1">
                         <span className="w-2 h-2 rounded-full bg-emerald-400" />

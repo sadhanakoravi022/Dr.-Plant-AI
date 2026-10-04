@@ -3,6 +3,7 @@ import { CropPlan } from './types';
 export const PALAK_PLAN: CropPlan = {
   crop: 'palak',
   name: 'Palak (Spinach)',
+  shortName: 'Palak',
   icon: '🥬',
   durationDays: 30,
   tasks: [

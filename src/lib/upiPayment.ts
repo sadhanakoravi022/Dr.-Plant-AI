@@ -55,7 +55,10 @@ export async function submitPremiumPaymentClaim(input: PremiumClaimInput): Promi
   }
 
   if (!isSupabaseConfigured || !supabase) {
-    return { success: true };
+    return {
+      success: false,
+      errorMessage: 'Payment verification is unavailable right now. Please try again later.',
+    };
   }
 
   const { error } = await supabase.from('premium_subscriptions').insert({
