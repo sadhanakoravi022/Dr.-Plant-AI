@@ -101,7 +101,7 @@ export async function signUpFarmer(input: SignUpInput): Promise<AuthResult> {
     return { success: false, errorMessage: 'Sign up did not return a user. Please try again.' };
   }
 
-  const { error: profileError } = await supabase.from('application_users').insert({
+  const { error: profileError } = await supabase.from('application_users').upsert({
     id: userId,
     full_name: input.fullName.trim(),
     phone: digitsOnly,
