@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { LanguageCode } from '../types';
 
 const PHONE_AUTH_DOMAIN = 'drplant.internal';
+const LAST_UID_KEY = 'dr_plant_last_uid';
 
 export interface FarmerProfile {
   id: string;
@@ -84,8 +85,8 @@ export async function signUpFarmer(input: SignUpInput): Promise<AuthResult> {
   if (digitsOnly.length < 10) {
     return { success: false, errorMessage: 'Enter a valid 10-digit mobile number.' };
   }
-  if (input.password.length < 4) {
-    return { success: false, errorMessage: 'Password must be at least 4 characters.' };
+  if (input.password.length < 6) {
+    return { success: false, errorMessage: 'Password must be at least 6 characters.' };
   }
   if (!input.fullName.trim()) {
     return { success: false, errorMessage: 'Enter your name.' };
@@ -119,10 +120,9 @@ export async function signUpFarmer(input: SignUpInput): Promise<AuthResult> {
     return { success: false, errorMessage: 'Sign up did not return a user. Please try again.' };
   }
 
-  // If a session was automatically created, we can safely upsert profile via authenticated RLS:
   let activeSession = data.session;
   if (!activeSession) {
-    // Attempt auto-login in case email confirmation is disabled but session wasn't returned in signUp
+
     const { data: signInData } = await supabase.auth.signInWithPassword({
       email,
       password: input.password,
@@ -131,19 +131,18 @@ export async function signUpFarmer(input: SignUpInput): Promise<AuthResult> {
   }
 
   if (activeSession) {
-    try {
-      await supabase.from('application_users').upsert({
-        id: userId,
-        full_name: metadata.full_name,
-        phone: metadata.phone,
-        village: metadata.village,
-        district: metadata.district,
-        state: metadata.state,
-        pincode: metadata.pincode,
-        preferred_language: metadata.preferred_language,
-      });
-    } catch (err) {
-      console.warn('Could not upsert profile after signup (trigger may have already handled it):', err);
+    const { error: upsertError } = await supabase.from('application_users').upsert({
+      id: userId,
+      full_name: metadata.full_name,
+      phone: metadata.phone,
+      village: metadata.village,
+      district: metadata.district,
+      state: metadata.state,
+      pincode: metadata.pincode,
+      preferred_language: metadata.preferred_language,
+    });
+    if (upsertError) {
+      console.warn('Could not upsert profile after signup:', upsertError.message);
     }
   }
 
@@ -180,8 +179,6 @@ export async function signInFarmer(input: SignInInput): Promise<AuthResult> {
 
   let profile = await fetchFarmerProfile(userId);
 
-  // If profile does not exist in application_users table (e.g. earlier failed signup or missing trigger),
-  // now that the user is authenticated (auth.uid() = userId), we can create it safely.
   if (!profile) {
     const meta = (data.user?.user_metadata || {}) as Record<string, string>;
     const digitsOnly = input.phone.replace(/\D/g, '');
@@ -248,10 +245,56 @@ export async function getCurrentFarmerProfile(): Promise<FarmerProfile | null> {
   const userId = data.session?.user?.id;
   if (!userId) return null;
 
-  return fetchFarmerProfile(userId);
+  const profile = await fetchFarmerProfile(userId);
+  if (profile) return profile;
+
+  const phone = (data.session?.user?.email || '').split('@')[0];
+  return {
+    id: userId,
+    fullName: 'Farmer',
+    phone,
+    village: '',
+    district: '',
+    state: '',
+    pincode: '',
+    preferredLanguage: 'en',
+  };
 }
 
 export async function signOutFarmer(): Promise<void> {
+  localStorage.removeItem(LAST_UID_KEY);
   if (!isSupabaseConfigured || !supabase) return;
-  await supabase.auth.signOut();
+  await supabase.auth.signOut({ scope: 'local' });
+}
+
+export async function getAuthUserId(): Promise<string | null> {
+  if (!isSupabaseConfigured || !supabase) return null;
+
+  const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    const userId = data.session?.user?.id;
+    if (userId) {
+      localStorage.setItem(LAST_UID_KEY, userId);
+      return userId;
+    }
+    if (error && offline) return localStorage.getItem(LAST_UID_KEY);
+  } catch {
+    if (offline) return localStorage.getItem(LAST_UID_KEY);
+  }
+
+  localStorage.removeItem(LAST_UID_KEY);
+  return null;
+}
+
+export function subscribeToAuthChanges(callback: (event: string, userId: string | null) => void): () => void {
+  if (!isSupabaseConfigured || !supabase) return () => {};
+
+  const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    const userId = session?.user?.id ?? null;
+    if (userId) localStorage.setItem(LAST_UID_KEY, userId);
+    if (event === 'SIGNED_OUT') localStorage.removeItem(LAST_UID_KEY);
+    callback(event, userId);
+  });
+  return () => data.subscription.unsubscribe();
 }
