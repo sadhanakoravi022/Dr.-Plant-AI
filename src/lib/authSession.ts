@@ -190,6 +190,19 @@ export async function getCurrentFarmerProfile(): Promise<FarmerProfile | null> {
   return fetchFarmerProfile(userId);
 }
 
+export async function getAuthUserId(): Promise<string | null> {
+  if (!isSupabaseConfigured || !supabase) return null;
+  const { data, error } = await supabase.auth.getUser();
+  if (error) throw error;
+  return data.user?.id || null;
+}
+
+export function subscribeToAuthChanges(callback: (event: string) => void): () => void {
+  if (!isSupabaseConfigured || !supabase) return () => undefined;
+  const { data } = supabase.auth.onAuthStateChange((event) => callback(event));
+  return () => data.subscription.unsubscribe();
+}
+
 export async function signOutFarmer(): Promise<void> {
   if (!isSupabaseConfigured || !supabase) return;
   await supabase.auth.signOut();

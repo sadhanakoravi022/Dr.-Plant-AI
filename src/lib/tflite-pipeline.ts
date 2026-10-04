@@ -124,9 +124,9 @@ export async function getDeepLearningModel(): Promise<CompiledModel | null> {
       // LiteRT.js needs a fixed input shape. fetchStaticShapeModel() downloads the
       // first valid .tflite from the list and changes the dynamic batch size (-1)
       // to 1 in memory, so it works with the original or an already-fixed model.
-      const modelBytes = await fetchStaticShapeModel([
-        `${base}model/model.tflite`,
+      const { bytes: modelBytes } = await fetchStaticShapeModel([
         `${base}model/trained_model/model.tflite`,
+        `${base}model/model.tflite`,
       ]);
       const model = await loadAndCompile(modelBytes, { accelerator: 'wasm' });
       cachedModel = model;
