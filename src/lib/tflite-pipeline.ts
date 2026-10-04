@@ -48,11 +48,12 @@ export async function getDeepLearningModel(): Promise<CompiledModel | null> {
     try {
 
       const base = import.meta.env.BASE_URL || '/';
+      const modelBase = new URL(base, window.location.origin);
       await loadLiteRt(`${base}litert-wasm/`);
 
       const { bytes: modelBytes, url: modelUrl } = await fetchStaticShapeModel([
-        `${base}model/trained_model/model.tflite`,
-        `${base}model/model.tflite`,
+        new URL('model/trained_model/model.tflite', modelBase).toString(),
+        new URL('model/model.tflite', modelBase).toString(),
       ]);
       const model = await loadAndCompile(modelBytes, { accelerator: 'wasm' });
 
